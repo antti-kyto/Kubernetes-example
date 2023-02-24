@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-api
+  labels:
+    app: my-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-api
+  template:
+    metadata:
+      labels:
+        app: my-api
+    spec:
+      containers:
+      - name: my-api
+        image: anttikyto/go-api:0.3
+        ports:
+        - containerPort: 3000
+        env:
+        - name: EMOJI
+          valueFrom:
+            configMapKeyRef:
+              name: my-api-config
+              key: hello-emoji
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-api
+spec:
+  type: NodePort
+  selector:
+    app: my-api
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30007
